@@ -1,0 +1,24 @@
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt;
+
+img=cv2.imread("bird.jpg",cv2.IMREAD_GRAYSCALE)
+plt.imshow(img,cmap="gray") # cmap is important
+plt.show()
+print(img.shape)
+
+  prob=0.5
+  noisy=add_salt_pepper_noise(img,prob)
+  plt.imshow(noisy,cmap="gray")
+
+height, width = noisy.shape
+filtered_image = np.zeros_like(noisy)
+
+for r in range(1, height - 1):
+    for c in range(1, width - 1):
+        neighborhood = noisy[r-1:r+2, c-1:c+2]
+        filtered_image[r, c] = np.mean(neighborhood)
+
+plt.imshow(filtered_image, cmap="gray")
+plt.axis("off")
+plt.show()
