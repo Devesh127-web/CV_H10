@@ -1,0 +1,30 @@
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from google.colab.patches import cv2_imshow
+
+img =cv2.imread(r"/content/download.jpg")
+print("Original Image:")
+cv2_imshow(img)
+
+y_start, y_end = 20, 120  
+x_start, x_end = 50, 150  
+cropped_img = img[y_start:y_end, x_start:x_end]
+print(f"Original image shape: {img.shape}")
+print(f"Cropped image shape: {cropped_img.shape}")
+cv2_imshow(cropped_img)
+
+print("Image Shape:", img.shape)
+print("Image Data Type:", img.dtype)
+
+resized = cv2.resize(img, (300, 300))
+print("\nResized Image:")
+cv2_imshow(resized)
+
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+print("\nGrayscale Image:")
+cv2_imshow(gray)
+
+blur = cv2.GaussianBlur(img, (13, 13), 0)
+print("Gaussian Blur Image:")
+cv2_imshow(blur)
