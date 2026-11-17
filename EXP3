@@ -1,0 +1,103 @@
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from numpy.lib.stride_tricks import sliding_window_view
+image = cv2.imread('bird.jpg', cv2.IMREAD_GRAYSCALE)
+plt.imshow(image, cmap="gray")
+plt.title("Original Image")
+def add_salt_pepper_noise(image, probability = 0.3):
+noisy = image.copy()
+random = np.random.rand(*image.shape)
+noisy[random < probability / 2] = 0
+noisy[random > 1 - probability / 2] = 255
+return noisy
+prob = 0.3
+noisy = add_salt_pepper_noise(image, prob)
+plt.imshow(noisy, cmap = "gray")
+plt.title("Noisy Image")
+Text(0.5, 1.0, 'Noisy Image')
+def mean_f(img, k=3, s=1):
+# Image dimensions
+h, w = img.shape
+# Padding size
+pad = k // 2
+# Pad the image
+padded = np.pad(img, pad, mode='reflect')
+# Output image dimensions
+out_h = (h - k + 2 * pad) // s + 1
+out_w = (w - k + 2 * pad) // s + 1
+# Output image
+og = np.zeros((out_h, out_w), dtype=img.dtype)
+# Apply mean filter
+for i in range(out_h):
+for j in range(out_w):
+# Extract k×k window
+window = padded[i*s:i*s+k, j*s:j*s+k]
+# Compute mean
+og[i, j] = np.mean(window)
+return og
+og = mean_f(noisy, k=3, s=1)
+plt.imshow(og, cmap='gray')
+plt.title("Mean Filtered Image")
+plt.axis('off')
+plt.show()
+def median_f(img, k=3, s=1):
+# Image dimensions
+h, w = img.shape
+# Padding size
+pad = k // 2
+# Pad the image
+padded = np.pad(img, pad, mode='reflect')
+# Output image dimensions
+out_h = (h - k + 2 * pad) // s + 1
+out_w = (w - k + 2 * pad) // s + 1
+# Output image
+og = np.zeros((out_h, out_w), dtype=img.dtype)
+# Apply median filter
+for i in range(out_h):
+for j in range(out_w):
+# Extract k × k window
+window = padded[i*s:i*s+k, j*s:j*s+k]
+# Compute median
+og[i, j] = np.median(window)
+return og
+median_filtered = median_f(noisy, k=3, s=1)
+plt.imshow(median_filtered, cmap='gray')
+plt.title("Median Filter")
+plt.axis('off')
+plt.show()
+kernel_sizes = [3, 5, 7]
+fig, axes = plt.subplots(1, len(kernel_sizes), figsize=(15, 5))
+for ax, k in zip(axes, kernel_sizes):
+result = mean_f(noisy, k=k, s=1)
+ax.imshow(result, cmap="gray")
+ax.set_title(f"Mean Filter, kernel={k}")
+ax.axis("off")
+plt.tight_layout()
+plt.show()
+fig, axes = plt.subplots(1, len(strides), figsize=(15, 5))
+for ax, s in zip(axes, strides):
+result = mean_f(noisy, k=3, s=s)
+ax.imshow(result, cmap="gray")
+ax.set_title(f"Mean Filter, stride={s}\nshape={result.shape}")
+ax.axis("off")
+plt.tight_layout()
+plt.show()
+kernel_sizes = [3, 5, 7]
+fig, axes = plt.subplots(1, len(kernel_sizes), figsize=(15, 5))
+for ax, k in zip(axes, kernel_sizes):
+result = median_f(noisy, k=k, s=1)
+ax.imshow(result, cmap="gray")
+ax.set_title(f"Median Filter, kernel={k}")
+ax.axis("off")
+plt.tight_layout()
+plt.show()
+strides = [1, 2, 3]
+fig, axes = plt.subplots(1, len(strides), figsize=(15, 5))
+for ax, s in zip(axes, strides):
+result = median_f(noisy, k=3, s=s)
+ax.imshow(result, cmap="gray")
+ax.set_title(f"Median Filter, stride={s}\nshape={result.shape}")
+ax.axis("off")
+plt.tight_layout()
+plt.show()
