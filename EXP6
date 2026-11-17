@@ -1,0 +1,99 @@
+import numpy as np import cv2
+import matplotlib.pyplot as plt # Read image in grayscale
+img = cv2.imread('cameraman.png', cv2.IMREAD_GRAYSCALE) # Display 
+original image
+plt.imshow(img, cmap="gray") plt.title("Original Image") 
+plt.axis("off")
+plt.show()
+# Create histogram array
+hist = np.zeros(256, dtype=int)
+# Count pixels for every intensity value for value in img.flatten():
+hist[value] += 1
+plt.bar(range(256), hist)
+plt.title("Grayscale Histogram") plt.xlabel("Pixel Intensity")
+plt.ylabel("Frequency") plt.show()
+def otsu_threshold(img): # Create histogram
+hist = np.zeros(256, dtype=int) for value in img.flatten():
+hist[value] += 1
+total_pixels = img.size
+# Probability of each intensity probability = hist / total_pixels 
+maximum_variance = 0
+threshold_value = 0
+intensity = np.arange(256)
+# Try every possible threshold for t in range(256):
+# Background: 0 to t
+weight_background = np.sum(probability[:t + 1]) # Foreground: t+1 to 
+255
+weight_foreground = np.sum(probability[t + 1:])
+if weight_background == 0 or weight_foreground == 0: continue
+# Mean of background mean_background = (
+np.sum(
+intensity[:t + 1] * probability[:t + 1]
+) / weight_background
+)
+# Mean of foreground mean_foreground = (
+np.sum(
+intensity[t + 1:] * probability[t + 1:]
+) / weight_foreground
+)
+# Between-class variance variance = (
+weight_background * weight_foreground *
+(mean_background - mean_foreground) ** 2
+)
+# Select threshold with maximum variance if variance > 
+maximum_variance:
+maximum_variance = variance threshold_value = t
+return threshold_value # Calculate Otsu threshold
+otsu_value = otsu_threshold(img)
+print("Otsu's Optimal Threshold:", otsu_value)
+Otsu's Optimal Threshold: 88
+rows, cols = img.shape
+# Create empty binary image
+binary = np.zeros((rows, cols), dtype=np.uint8) # Apply threshold
+for r in range(rows):
+for c in range(cols):
+if img[r, c] > otsu_value: binary[r, c] = 255
+else:
+binary[r, c] = 0 # Display binary image
+plt.imshow(binary, cmap="gray")
+plt.title(f"Otsu Binarized Image (t={otsu_value})") plt.axis("off")
+plt.show()
+plt.bar(range(256), hist) 
+plt.axvline(x=otsu_value, color='red',
+linestyle='--',
+label=f"Threshold = {otsu_value}"
+)
+plt.title("Histogram with Otsu's Threshold") 
+plt.xlabel("Pixel Intensity")
+plt.ylabel("Frequency") 
+plt.legend()
+plt.show()
+fig, axes = plt.subplots(1, 3, figsize=(15, 5)) 
+# Original image
+axes[0].imshow(img, cmap="gray") 
+axes[0].set_title("Original")
+axes[0].axis("off")
+# Histogram
+axes[1].bar(range(256), hist) 
+axes[1].axvline(
+x=otsu_value, color='red', linestyle='--'
+)
+axes[1].set_title(f"Histogram (t={otsu_value})") 
+# Binary image
+axes[2].imshow(binary, cmap="gray") 
+axes[2].set_title("Otsu Binarized") 
+axes[2].axis("off")
+plt.tight_layout() 
+plt.show()
+opencv_value, opencv_binary = cv2.threshold( img,
+0,
+255,
+cv2.THRESH_BINARY + cv2.THRESH_OTSU
+)
+print("Manual Otsu Threshold:", otsu_value)
+print("OpenCV Otsu Threshold:", opencv_value) 
+# Display OpenCV result
+plt.imshow(opencv_binary, cmap="gray")
+plt.title(f"OpenCV Otsu (t={opencv_value})") 
+plt.axis("off")
+plt.show()
